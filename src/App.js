@@ -260,17 +260,27 @@ function MovieDetials({ selectedId, onCloseMovie, onAddWatched, watched }) {
     function () {
       async function getMovieDetails() {
         setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
-        );
-        const data = await res.json();
-        setMovies(data);
-        setIsLoading(false);
+
+        try {
+          const corsProxy = "https://corsproxy.io/?";
+          const url = `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`;
+
+          const res = await fetch(corsProxy + encodeURIComponent(url));
+          const data = await res.json();
+
+          setMovies(data);
+        } catch (error) {
+          console.error("Fetch error:", error);
+        } finally {
+          setIsLoading(false);
+        }
       }
-      getMovieDetails();
+
+      if (selectedId) getMovieDetails();
     },
     [selectedId]
   );
+
   useEffect(
     function () {
       if (!title) return;
